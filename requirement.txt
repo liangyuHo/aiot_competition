@@ -1,0 +1,17 @@
+SpeechRecognition
+os
+shutil
+wave
+json
+numpy
+iNLP
+subprocess
+pydub
+fastapi
+pyautogui
+pathlib
+shutil
+inlp
+jieba
+tensorflow
+opencv-python
