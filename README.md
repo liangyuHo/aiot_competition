@@ -17,7 +17,9 @@
 * 將 ffmpeg-master-latest-win64-gpl\bin 添加至環境變數
 
 ## 安裝python package
-
+```
+pip install -r requirements.txt
+```
 
 ## 執行
 * 開啟 fastapi 
