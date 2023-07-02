@@ -31,3 +31,8 @@ uvicorn main:app --reload
 ```
 python people.py
 ```
+
+* 執行 volumn.py (偵測分貝數，透過 POST 傳資料給 main)
+```
+python volumn.py
+```
