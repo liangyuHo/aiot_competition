@@ -1,6 +1,7 @@
 # aiot_competition
 ## 資料夾
 ```
+├── DB_data (存放分貝紀錄)
 ├── meeting_text (存放會議記錄)
 ├── people_data (存放歷史人數紀錄)
 ├── ssd_inception_v2_coco_2017_11_17 (辨識人臉)
