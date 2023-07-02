@@ -189,7 +189,6 @@ if __name__ == "__main__":
         #             cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 0, 0), 2)
         
         people_data = {"people": office_people.get_office_people()}
-        print(people_data)
         response = requests.post("http://localhost:8000/peopleData/", json=people_data)            
                     
         # 辦公室人數

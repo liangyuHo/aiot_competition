@@ -1,4 +1,4 @@
-fastapi==0.98.0
+fastapi==0.99.0
 iNLP==0.0.2
 jieba==0.42.1
 networkx==2.8.4
@@ -9,6 +9,7 @@ pandas==1.4.4
 PyAutoGUI==0.9.53
 pydantic==1.10.9
 pydub==0.25.1
+pyserial==3.5
 Requests==2.31.0
 SpeechRecognition==3.10.0
 tensorflow==2.12.0

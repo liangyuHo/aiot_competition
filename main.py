@@ -111,6 +111,19 @@ async def receive_data(item: DataItem):
 
 
 
+##############################################################################
+##### 分貝數
+class DBValue(BaseModel):
+    DB: float
+
+@app.post("/DBdata/")
+async def get_DB(item: DBValue):
+    global DB_data
+    DB_data = item.DB
+    print(DB_data)
+    return {}
+
+
 
 ##############################################################################
 ##### 取得五分鐘內的身體資料(手錶數據)，包含心情指數、心跳或血氧等
