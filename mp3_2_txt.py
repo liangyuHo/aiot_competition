@@ -94,18 +94,19 @@ def CutFile(WavName, target_path):
  
 
  
-def texts_to_one(path, target_file):
+def texts_to_one(path):
     files = os.listdir(path)
     files.sort()
-    files = [path+"/" + f for f in files if f.endswith(".txt")]
-    with open(target_file, "w", encoding="utf-8") as f:
-        for file in files:
-            with open(file, "r", encoding='utf-8') as f2:
-                txt= f2.read().split("\n")
-                if len(txt) < 2:
-                    continue
-                f.write(txt[1])
-    print("完成合併, 檔案位於 %s " % target_file)
+    files = [path+"\\" + f for f in files if f.endswith(".txt")]
+    string = ""
+    for file in files:
+        with open(file, "r", encoding='utf-8') as f2:
+            txt= f2.read().split("\n")
+            if len(txt) < 2:
+                continue
+            
+            string = string+txt[1]
+    return string
  
  
 
@@ -190,14 +191,14 @@ def convert(mp3file):
   # VoiceToText_thread(files)
   # VoiceToText_thread(wav_path, files, txt_path)
   now = datetime.now()
-  target_txtfile = "./meeting_text/{}-{}-{}.txt".format(now.date(),now.hour,now.minute)
-  texts_to_one(txt_path, target_txtfile)
+  meeting_time = "{}-{}-{}".format(now.date(),now.hour,now.minute)
+  # texts_to_one(txt_path, target_txtfile)
 
   # shutil.rmtree(wav_path)
   # shutil.rmtree(txt_path)
-  print(FileName)
+  
   # os.remove(mp3Name)
   os.remove(WavName)
   reset_dir(wav_path)
-  reset_dir(txt_path)
-  return target_txtfile
+  # reset_dir(txt_path)
+  return txt_path,meeting_time

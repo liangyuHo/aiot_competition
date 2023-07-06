@@ -2,7 +2,6 @@ fastapi==0.99.0
 iNLP==0.0.2
 jieba==0.42.1
 networkx==2.8.4
-numpy==1.21.5
 numpy==1.23.5
 opencv_python==4.7.0.72
 pandas==1.4.4
@@ -14,3 +13,4 @@ Requests==2.31.0
 SpeechRecognition==3.10.0
 tensorflow==2.12.0
 tensorflow_intel==2.12.0
+uvicorn==0.22.0

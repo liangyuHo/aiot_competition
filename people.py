@@ -181,12 +181,12 @@ if __name__ == "__main__":
             prev_direction = current_direction
             list_X.pop(0)
 
-        # # 顯示進出人數
-        # cv2.putText(img, f'Enter count: {enter_count}', (40, 80),
-        #             cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 0, 0), 2)
-        # if len(list_X)>0:
-        #     cv2.putText(img, f'Exit count: {exit_count}', (40, 120),
-        #             cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 0, 0), 2)
+        # 顯示進出人數
+        cv2.putText(img, f'Enter count: {enter_count}', (40, 80),
+                    cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 0, 0), 2)
+        if len(list_X)>0:
+            cv2.putText(img, f'Exit count: {exit_count}', (40, 120),
+                    cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 0, 0), 2)
         
         people_data = {"people": office_people.get_office_people()}
         response = requests.post("http://localhost:8000/peopleData/", json=people_data)            
@@ -198,7 +198,7 @@ if __name__ == "__main__":
         
         
         out.write(img)
-        # cv2.imshow("detect", img)
+        cv2.imshow("detect", img)
         key = cv2.waitKey(1)
         # 按下小q退出while迴圈
         if key & 0xFF == ord('q'):

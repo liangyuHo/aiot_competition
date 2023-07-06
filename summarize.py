@@ -12,8 +12,7 @@ import codecs
 from textrank4zh import TextRank4Keyword, TextRank4Sentence
 
 def summary(txtFile):
-    text = codecs.open(txtFile, 'r', 'utf-8').read()
-    text = text.replace(' ','。')
+    text = txtFile.replace(' ','。')
     tr4w = TextRank4Keyword()
 
     tr4w.analyze(text=text, lower=True, window=2)   # py2中text必须是utf8编码的str或者unicode对象，py3中必须是utf8编码的bytes或者str对象
@@ -24,8 +23,9 @@ def summary(txtFile):
 
     print()
     print( '關鍵短句：' )
+    result = []
     for phrase in tr4w.get_keyphrases(keywords_num=20, min_occur_num= 2):
-        print(phrase)
+        result.append(phrase)
 
     tr4s = TextRank4Sentence()
     tr4s.analyze(text=text, lower=True, source = 'all_filters')
@@ -34,3 +34,4 @@ def summary(txtFile):
     print( '摘要：' )
     for item in tr4s.get_key_sentences(num=3):
         print(item.index, item.weight, item.sentence)
+    return(result)
