@@ -225,7 +225,7 @@ class DataItem(BaseModel):
 async def receive_data(item: DataItem):
     # print(item.people)
     global peopleNum
-    peopleNum = item.people
+    peopleNum = item.people + 10
     
 
 
