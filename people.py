@@ -198,7 +198,7 @@ if __name__ == "__main__":
         
         
         out.write(img)
-        cv2.imshow("detect", img)
+        # cv2.imshow("detect", img)
         key = cv2.waitKey(1)
         # 按下小q退出while迴圈
         if key & 0xFF == ord('q'):

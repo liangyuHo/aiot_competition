@@ -65,21 +65,19 @@ async def delete_post(id: int, context: str):
 
 @app.get("/search_post")
 def get_post():
-    all_post = pd.read_csv('posts.csv') 
-    
+    all_post = pd.read_csv('posts.csv')     
     result = []
     print(all_post.iloc[0][0],all_post.iloc[0][1])
     for i in range(all_post.shape[0]):
         result.append({"user":all_post.iloc[i][0],"context":all_post.iloc[i][1]})
-    
     return result
 
 
 
-
+##############################################################################
+##### 辦公室環境狀態
 @app.get("/status")
 def get_all_status():
-
     return {"people_now":peopleNum,"people_hour":0,
             "temp":four_environment['temp'],"hpa":four_environment['hpa'],
             "humidity":four_environment['%RH'],"gas":four_environment['ohms'],
@@ -87,11 +85,11 @@ def get_all_status():
 
 
 
+
 ##############################################################################
 ##### 歷史所有會議紀錄
 @app.get("/meeting_record")
-def get_meeting_record():
-    
+def get_meeting_record():    
     # 打開 json 檔案
     with open('.\meeting_text\meeting.json', 'r') as file:
     # 載入 JSON 檔案
@@ -107,9 +105,6 @@ def get_meeting_record():
 ##### 取得五分鐘內的身體資料(手錶數據)，包含心情指數、心跳或血氧等
 @app.get("/watch")
 def get_watch_data():
-
-
-
     return {}
 
 
@@ -120,7 +115,6 @@ def get_watch_data():
 async def get_health_predict(health:Dict):
     with open('./watch/health_predict.pkl', 'rb') as file:
         health_model = pickle.load(file)
-
     global result
     result = health_model.predict(health)
 
@@ -191,8 +185,6 @@ async def upload_file(title: str = Form(...) ,  file: UploadFile = File(...)):
         json.dump(data, jsfile)
     
     reset_dir(txt_path)
-    # return {"filename": file.filename}
-    return{}
 
 
 
