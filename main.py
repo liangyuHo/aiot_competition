@@ -105,10 +105,19 @@ def get_meeting_record():
 ##### 取得五分鐘內的身體資料(手錶數據)，包含心情指數、心跳或血氧等
 @app.get("/watch")
 def get_watch_data():
-    return {"HR":health_current["HR"], "RR":health_current["RR"], 
-            "R":health_current["R"], "SPO2":health_current["SPO2"],
-            "HR_pre":health_predict[0][0], "RR_pre":health_predict[0][0], 
+    return {"HR":health_current[0], "SPO2":health_current[1], 
+            "activity":health_current[2], "mood":health_current[3]}
+
+
+
+
+##############################################################################
+##### 取得五分鐘內的身體資料(手錶數據)，包含心情指數、心跳或血氧等
+@app.get("/watch_predict")
+def predict_health():
+    return{"HR_pre":health_predict[0][0], "RR_pre":health_predict[0][0], 
             "R_pre":health_predict[0][0], "SPO2_pre":health_predict[0][0]}
+
 
 
 
@@ -121,14 +130,28 @@ def load_feature_data():
     if feature is None:
         feature = pd.read_csv('./watch/health_data.csv',sep=',',header=None)[:600]
 
+def mood_score(data):
+    mood_score = 0    
+    # motion flag
+    if data['motion'] == 0:
+        mood_score += 5
+    # HR
+    if data['HR'] >= 60 and data['HR'] <= 100:
+        mood_score += ((data['HR'] - 60) / 40) * 50
+    # SpO2
+    if data['SpO2'] >= 90:
+        mood_score += ((data['SpO2'] - 90) / 10) * 50
+    return mood_score
+
+
 @app.post("/health_predict/")
 async def get_health_predict(health:Dict):
+    ## 創 activity
+    activity = {0:"Rest",1:"Other",2:"Walk",3:"Run",4:"Bike",5:"Rhythmic"}
     
     global feature    
     ## 一開始抓599筆資料
     load_feature_data()
-
-
     ## 處理 feature 讓 feature 保持 600 
     new_rows = pd.DataFrame([health['HR'],health['SpO2'],health['RR'],health['R'],
                                  health['activity'],health['motion'],health['hrconf'],
@@ -137,6 +160,8 @@ async def get_health_predict(health:Dict):
     if len(feature)>= 600:
         feature = feature.tail(600)
   
+    ## 心情指數
+    mood = mood_score(health)
   
     ## 抓模型下來，預測結果
     loaded_model = load_model('./watch/model.h5')
@@ -144,12 +169,17 @@ async def get_health_predict(health:Dict):
     
     ## 取得當前數據
     global health_current
-    health_current = health
+    health_current = []
+    health_current.append(health['HR'])
+    health_current.append(health['SpO2'])
+    health_current.append(activity[health['activity']])
+    health_current.append(mood)
 
     ## 取得預測結果
     global health_predict
     health_predict = np.mean(predict,axis=1)
-    # print(health_predict[0][0])
+    
+   
 
 
 
