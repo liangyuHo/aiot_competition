@@ -27,7 +27,7 @@ pip install -r requirements.txt
 ```
 ipconfig   
 ```
-** 確定 ipv4 的值
+* * 確定 ipv4 的值
 
 * 開啟 fastapi 
 ```
