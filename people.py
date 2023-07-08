@@ -6,8 +6,10 @@ import datetime
 import os
 import csv
 import requests
+import sys
+from arg_parser import parse_arguments
 
-
+args = parse_arguments()
 class DetectorAPI:
     def __init__(self, path_to_ckpt):
         self.path_to_ckpt = path_to_ckpt
@@ -189,8 +191,12 @@ if __name__ == "__main__":
                     cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 0, 0), 2)
         
         people_data = {"people": office_people.get_office_people()}
-        response = requests.post("http://localhost:8000/peopleData/", json=people_data)            
-                    
+
+        try:
+            response = requests.post('http://'+args.IP+'/peopleData/', json=people_data)            
+        except:
+            pass
+
         # 辦公室人數
         office_people.set_office_people(enter_count-exit_count)
         # print(office_people.get_office_people())

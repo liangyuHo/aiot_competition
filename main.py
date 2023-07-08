@@ -1,12 +1,10 @@
 from fastapi import FastAPI, UploadFile, File, Form
-import pyautogui
 import time
 import pandas as pd
 import os
 import csv
 import json
 import numpy as np
-import pickle
 from fastapi.responses import HTMLResponse
 import shutil
 from pathlib import Path
@@ -80,10 +78,12 @@ def get_post():
 ##### 辦公室環境狀態
 @app.get("/status")
 def get_all_status():
-    return {"people_now":peopleNum,"people_hour":0,
+    return {"people_now":str(peopleNum),"people_hour":0,
             "temp":four_environment['temp'],"hpa":four_environment['hpa'],
-            "humidity":four_environment['%RH'],"gas":four_environment['ohms'],
-            "co2":0, "DB":DB_data}
+            "humidity":four_environment['%RH'],"gas":four_environment['Ohms']
+            , "DB":DB_data}
+
+
 
 
 
@@ -101,6 +101,8 @@ def get_meeting_record():
 
 
 
+
+
 ##############################################################################
 ##### 取得五分鐘內的身體資料(手錶數據)，包含心情指數、心跳或血氧等
 @app.get("/watch")
@@ -111,12 +113,14 @@ def get_watch_data():
 
 
 
+
 ##############################################################################
 ##### 取得五分鐘內的身體資料(手錶數據)，包含心情指數、心跳或血氧等
 @app.get("/watch_predict")
 def predict_health():
-    return{"HR_pre":health_predict[0][0], "RR_pre":health_predict[0][0], 
-            "R_pre":health_predict[0][0], "SPO2_pre":health_predict[0][0]}
+    return {"HR_pre":health_predict[0], "RR_pre":health_predict[1], 
+        "R_pre":health_predict[2], "SPO2_pre":health_predict[3]}
+
 
 
 
@@ -146,6 +150,7 @@ def mood_score(data):
 
 @app.post("/health_predict/")
 async def get_health_predict(health:Dict):
+    health = {key: float(value) for key, value in health.items()}
     ## 創 activity
     activity = {0:"Rest",1:"Other",2:"Walk",3:"Run",4:"Bike",5:"Rhythmic"}
     
@@ -175,13 +180,16 @@ async def get_health_predict(health:Dict):
     health_current.append(activity[health['activity']])
     health_current.append(mood)
 
+    predict = np.mean(predict,axis=1)
     ## 取得預測結果
     global health_predict
-    health_predict = np.mean(predict,axis=1)
-    
+    # health_predict = np.mean(predict,axis=1)
+    health_predict = []
+    health_predict.append(str(predict[0][0]))
+    health_predict.append(str(predict[0][1]))
+    health_predict.append(str(predict[0][2]))
+    health_predict.append(str(predict[0][3]))
    
-
-
 
 
 ##############################################################################

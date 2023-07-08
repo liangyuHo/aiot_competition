@@ -5,7 +5,10 @@ import os
 import csv
 import serial
 import requests
+import sys
+from arg_parser import parse_arguments
 
+args = parse_arguments()
 # 回傳volumn data
 class Volumn_detect:
     def __init__(self):
@@ -64,7 +67,7 @@ if __name__ == "__main__":
     volumn_detect = Volumn_detect()
     volumn_detect.start_csv_writing()
     ser = serial.Serial()
-    ser.port = "COM6"
+    ser.port = args.COM
     ser.baudrate = 115200
     ser.timeout = 0.5          #non-block read 0.5s
     ser.writeTimeout = 0.5     #timeout for write 0.5s
@@ -89,8 +92,10 @@ if __name__ == "__main__":
 
                 # 用 post 傳資料
                 DB_data = {"DB": response}
-                response = requests.post("http://localhost:8000/DBdata/", json=DB_data)  
-
+                try :
+                    response = requests.post('http://'+args.IP+'/DBdata/', json=DB_data)  
+                except:
+                    pass
                 volumn_detect.write_volumn_to_csv()
                 # 設定幾秒讀一次，沒設的話他會一秒太多筆   
                 time.sleep(0.5)
