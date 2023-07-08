@@ -5,6 +5,7 @@ import pandas as pd
 import os
 import csv
 import json
+import numpy as np
 import pickle
 from fastapi.responses import HTMLResponse
 import shutil
@@ -14,6 +15,7 @@ from summarize import summary
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Dict
+from keras.models import save_model, load_model
 
 
 
@@ -49,7 +51,7 @@ async def create_post(post : Post):
         if not file_exists:
             writer.writerow(['user', 'text'])
         writer.writerow([post.user, post.text])
-    return {}
+   
 
 @app.post("/delete/")
 async def delete_post(id: int):
@@ -99,24 +101,55 @@ def get_meeting_record():
 
 
 
-
-
 ##############################################################################
 ##### 取得五分鐘內的身體資料(手錶數據)，包含心情指數、心跳或血氧等
 @app.get("/watch")
 def get_watch_data():
-    return {}
+    return {"HR":health_current["HR"], "RR":health_current["RR"], 
+            "R":health_current["R"], "SPO2":health_current["SPO2"],
+            "HR_pre":health_predict[0][0], "RR_pre":health_predict[0][0], 
+            "R_pre":health_predict[0][0], "SPO2_pre":health_predict[0][0]}
 
 
 
 ##############################################################################
 ##### 預測的健康數據，時間可以指定(以小時或天計算)
+
+feature = None
+def load_feature_data():
+    global feature
+    if feature is None:
+        feature = pd.read_csv('./watch/health_data.csv',sep=',',header=None)[:600]
+
 @app.post("/health_predict/")
 async def get_health_predict(health:Dict):
-    with open('./watch/health_predict.pkl', 'rb') as file:
-        health_model = pickle.load(file)
-    global result
-    result = health_model.predict(health)
+    
+    global feature    
+    ## 一開始抓599筆資料
+    load_feature_data()
+
+
+    ## 處理 feature 讓 feature 保持 600 
+    new_rows = pd.DataFrame([health['HR'],health['SpO2'],health['RR'],health['R'],
+                                 health['activity'],health['motion'],health['hrconf'],
+                                 health['rrconf'],health['wspo2conf']]).T
+    feature = pd.concat([feature, new_rows], ignore_index=True)
+    if len(feature)>= 600:
+        feature = feature.tail(600)
+  
+  
+    ## 抓模型下來，預測結果
+    loaded_model = load_model('./watch/model.h5')
+    predict = loaded_model.predict(feature[[0,2,3,1]].to_numpy().reshape(-1,600,4)).reshape((-1, 60, 4))
+    
+    ## 取得當前數據
+    global health_current
+    health_current = health
+
+    ## 取得預測結果
+    global health_predict
+    health_predict = np.mean(predict,axis=1)
+    # print(health_predict[0][0])
 
 
 
