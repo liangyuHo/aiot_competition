@@ -1,10 +1,12 @@
 from fastapi import FastAPI, UploadFile, File, Form
 import time
 import pandas as pd
+import random
 import os
 import csv
 import json
 import numpy as np
+import keyboard
 from fastapi.responses import HTMLResponse
 import shutil
 from pathlib import Path
@@ -76,12 +78,38 @@ def get_post():
 
 ##############################################################################
 ##### 辦公室環境狀態
+
+co2value = random.randint(1100, 1300)
+normal_state = True
+
 @app.get("/status")
 def get_all_status():
     return {"people_now":str(peopleNum),"people_hour":0,
             "temp":four_environment['temp'],"hpa":four_environment['hpa'],
             "humidity":four_environment['%RH'],"gas":four_environment['Ohms']
-            , "DB":DB_data}
+            , "DB":DB_data,"co2":random.randint(900,1300)}
+    # global normal_state
+    # global co2value
+    # step = 10
+    
+    # while True:
+    #     if normal_state:
+    #         co2value = random.randint(1100, 1300)
+    #     if keyboard.is_pressed('up'):
+    #         normal_state = False
+    #         co2value += step
+    #     elif keyboard.is_pressed('down'):
+    #         normal_state = False
+    #         co2value -= step
+    #     elif keyboard.is_pressed('right'):
+    #         normal_state = True
+
+    #     if co2value < 1100:
+    #         co2value = 1100
+    #     elif co2value > 1300:
+    #         co2value = 1300
+
+    #     return {"co2":co2value,"state":normal_state}
 
 
 
@@ -118,8 +146,34 @@ def get_watch_data():
 ##### 取得五分鐘內的身體資料(手錶數據)，包含心情指數、心跳或血氧等
 @app.get("/watch_predict")
 def predict_health():
-    return {"HR_pre":health_predict[0], "RR_pre":health_predict[1], 
-        "R_pre":health_predict[2], "SPO2_pre":health_predict[3]}
+    health_thr = {}
+    if health_predict[0] >= 100:
+        health_thr['心率'] = '過高'
+    elif  health_predict[0] <= 50:
+        health_thr['心率'] = '過低'
+    else:
+        health_thr['心率'] = '正常'
+
+    if health_predict[1] >= 1200:
+        health_thr['RR值'] = '過高'
+    elif  health_predict[1] <= 600:
+        health_thr['RR值'] = '過低'
+    else:
+        health_thr['RR值'] = '正常'
+
+    if health_predict[2] >= 2:
+        health_thr['R值'] = '過高'
+    elif  health_predict[2] <= 0:
+        health_thr['R值'] = '過低'
+    else:
+        health_thr['R值'] = '正常'
+
+    if  health_predict[3] <= 95:
+        health_thr['血氧值'] = '過低'
+    else:
+        health_thr['血氧值'] = '正常'
+        
+    return health_thr
 
 
 
@@ -141,10 +195,10 @@ def mood_score(data):
         mood_score += 5
     # HR
     if data['HR'] >= 60 and data['HR'] <= 100:
-        mood_score += ((data['HR'] - 60) / 40) * 50
+        mood_score += (1-((data['HR'] - 60) / 40)) * 50
     # SpO2
     if data['SpO2'] >= 90:
-        mood_score += ((data['SpO2'] - 90) / 10) * 50
+        mood_score += (1-((data['SpO2'] - 90) / 10)) * 50
     return mood_score
 
 
@@ -250,7 +304,7 @@ async def upload_file(title: str = Form(...) ,  file: UploadFile = File(...)):
         except:
             data = []
             pass
-        data.append({"context":meeting_context,"keyword":keyword,"meeting_time":meeting_time})
+        data.append({"title":title,"context":meeting_context,"keyword":keyword,"meeting_time":meeting_time})
         
     with open('.\meeting_text\meeting.json','w') as jsfile:
         json.dump(data, jsfile)
