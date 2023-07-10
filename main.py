@@ -198,7 +198,7 @@ def mood_score(data):
         mood_score += (1-((data['HR'] - 60) / 40)) * 50
     # SpO2
     if data['SpO2'] >= 90:
-        mood_score += (1-((data['SpO2'] - 90) / 10)) * 50
+        mood_score += ((data['SpO2'] - 90) / 10) * 50
     return mood_score
 
 
